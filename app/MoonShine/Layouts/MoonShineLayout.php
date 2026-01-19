@@ -12,6 +12,7 @@ use MoonShine\Contracts\ColorManager\PaletteContract;
 use App\MoonShine\Resources\Category\CategoryResource;
 use MoonShine\MenuManager\MenuItem;
 use App\MoonShine\Resources\Slide\SlideResource;
+use App\MoonShine\Resources\Product\ProductResource;
 
 final class MoonShineLayout extends AppLayout
 {
@@ -33,6 +34,7 @@ final class MoonShineLayout extends AppLayout
             ...parent::menu(),
             MenuItem::make(CategoryResource::class, 'Категории'),
             MenuItem::make(SlideResource::class, 'Баннеры'),
+            MenuItem::make(ProductResource::class, 'Продукты'),
         ];
     }
 

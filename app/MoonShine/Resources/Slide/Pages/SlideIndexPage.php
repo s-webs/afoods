@@ -4,8 +4,12 @@ declare(strict_types=1);
 
 namespace App\MoonShine\Resources\Slide\Pages;
 
+use App\Models\Category;
+use App\Models\Slide;
+use Illuminate\Database\Eloquent\Builder;
 use MoonShine\Laravel\Pages\Crud\IndexPage;
 use MoonShine\Contracts\UI\ComponentContract;
+use MoonShine\UI\Components\Metrics\Wrapped\ValueMetric;
 use MoonShine\UI\Components\Table\TableBuilder;
 use MoonShine\Contracts\UI\FieldContract;
 use MoonShine\Laravel\QueryTags\QueryTag;
@@ -61,7 +65,10 @@ class SlideIndexPage extends IndexPage
      */
     protected function queryTags(): array
     {
-        return [];
+        return [
+            QueryTag::make('Активные', fn(Builder $query) => $query->where('is_active', 1)),
+            QueryTag::make('Не активные', fn(Builder $query) => $query->where('is_active', 0)),
+        ];
     }
 
     /**
@@ -69,11 +76,14 @@ class SlideIndexPage extends IndexPage
      */
     protected function metrics(): array
     {
-        return [];
+        return [
+            ValueMetric::make('Слайдов')
+                ->value(fn() => Slide::count())
+        ];
     }
 
     /**
-     * @param  TableBuilder  $component
+     * @param TableBuilder $component
      *
      * @return TableBuilder
      */

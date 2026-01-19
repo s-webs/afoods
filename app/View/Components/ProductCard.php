@@ -2,25 +2,26 @@
 
 namespace App\View\Components;
 
+use App\Models\Product;
 use Closure;
 use Illuminate\Contracts\View\View;
 use Illuminate\View\Component;
 
 class ProductCard extends Component
 {
-    /**
-     * Create a new component instance.
-     */
+    public Product $product;
+    public string $units;
+    public string $currency;
+
     public function __construct(
-        public string $image,
-        public string $name,
-        public int $price,
-        public string $units = 'шт',
-        public string $currency = '₸',
-        public string $link = '##'
+        Product $product,
+        string  $units = 'шт',
+        string  $currency = '₸',
     )
     {
-        //
+        $this->product = $product;
+        $this->units = $units;
+        $this->currency = $currency;
     }
 
     /**

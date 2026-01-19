@@ -12,6 +12,7 @@ use App\MoonShine\Resources\MoonShineUser\MoonShineUserResource;
 use App\MoonShine\Resources\MoonShineUserRole\MoonShineUserRoleResource;
 use App\MoonShine\Resources\Category\CategoryResource;
 use App\MoonShine\Resources\Slide\SlideResource;
+use App\MoonShine\Resources\Product\ProductResource;
 
 class MoonShineServiceProvider extends ServiceProvider
 {
@@ -26,6 +27,7 @@ class MoonShineServiceProvider extends ServiceProvider
                 MoonShineUserRoleResource::class,
                 CategoryResource::class,
                 SlideResource::class,
+                ProductResource::class,
             ])
             ->pages([
                 ...$core->getConfig()->getPages(),
