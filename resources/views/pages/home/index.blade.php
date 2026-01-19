@@ -3,11 +3,12 @@
 @section('content')
     <div class="container mx-auto px-2">
         <div class="mt-7.5">
-            <x-search-field/>
+            <x-search-field />
         </div>
         <div class="mt-7.5">
-            slider
+            <x-banner-slider :slides="$slides" />
         </div>
+
         <div class="mt-7.5">
             <x-heading heading="Новое поступление"/>
             <div class="mt-3.75">

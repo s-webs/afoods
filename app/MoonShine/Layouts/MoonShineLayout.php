@@ -9,6 +9,9 @@ use MoonShine\ColorManager\Palettes\SkyPalette;
 use MoonShine\ColorManager\ColorManager;
 use MoonShine\Contracts\ColorManager\ColorManagerContract;
 use MoonShine\Contracts\ColorManager\PaletteContract;
+use App\MoonShine\Resources\Category\CategoryResource;
+use MoonShine\MenuManager\MenuItem;
+use App\MoonShine\Resources\Slide\SlideResource;
 
 final class MoonShineLayout extends AppLayout
 {
@@ -28,6 +31,8 @@ final class MoonShineLayout extends AppLayout
     {
         return [
             ...parent::menu(),
+            MenuItem::make(CategoryResource::class, 'Категории'),
+            MenuItem::make(SlideResource::class, 'Баннеры'),
         ];
     }
 
