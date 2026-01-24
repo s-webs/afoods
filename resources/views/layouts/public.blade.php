@@ -17,21 +17,25 @@
     </div>
 </header>
 @yield('content')
-<div class="w-full fixed bottom-5">
+<div class="w-full fixed bottom-5 z-50">
     <div class="container mx-auto px-2">
-        <div class="relative w-full shadow-[0px_1px_6px_-2px_rgba(0,0,0,0.8)] rounded-full">
-            <div class="bg-white rounded-full relative z-20 w-full flex items-center px-5 py-2.5">
-{{--                <div class="text-2xl text-main cursor-pointer"><i class="ph-bold ph-list"></i></div>--}}
-{{--                <div class="bg-main w-0.5 h-7.5 ml-2.75 mr-4.5 rounded-full"></div>--}}
-                <div class="flex items-center flex-1 justify-between">
+        <div class="relative w-full">
+            <!-- Decorative shadow layer -->
+            <div class="absolute z-10 bg-linear-to-r from-main/30 via-main/20 to-main/30 h-full inset-x-0 -bottom-0.75 rounded-full blur-sm"></div>
+
+            <!-- Main menu with glass effect -->
+            <div class="bg-white/95 backdrop-blur-md rounded-full relative z-20 w-full flex items-center px-2 py-2 shadow-[0px_4px_24px_-2px_rgba(75,157,203,0.4)] border border-main/10">
+                <div class="flex items-center flex-1 px-[20px] justify-between w-full">
                     <x-bottom-nav-item name="главная" icon="ph-bold ph-house"/>
                     <x-bottom-nav-item name="категории" route-name="categories.index" icon="ph-bold ph-list-bullets"/>
                     <x-bottom-nav-item name="корзина" icon="ph-bold ph-basket"/>
-                    <x-bottom-nav-item name="профиль" icon="ph-bold ph-user"/>
+                    @auth
+                        <x-bottom-nav-item name="профиль" route-name="profile.show" icon="ph-bold ph-user"/>
+                    @else
+                        <x-bottom-nav-item name="профиль" route-name="login" icon="ph-bold ph-user"/>
+                    @endauth
                 </div>
             </div>
-
-            <div class="absolute z-10 bg-main h-full inset-x-0 -bottom-0.75 rounded-full"></div>
         </div>
     </div>
 </div>
