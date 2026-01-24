@@ -32,13 +32,15 @@ Route::middleware('guest')->group(function () {
 Route::get('/products/{productSlug}', [\App\Http\Controllers\Public\ProductsController::class, 'show'])->name('products.show');
 Route::get('/categories/{categorySlug}', [\App\Http\Controllers\Public\ProductsController::class, 'index'])->name('products.index');
 
+// Profile route (accessible to all, shows stub for guests)
+Route::get('/profile', [ProfileController::class, 'show'])->name('profile.show');
+
 // Authenticated routes
 Route::middleware('auth')->group(function () {
     // Logout
     Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 
-    // Profile
-    Route::get('/profile', [ProfileController::class, 'show'])->name('profile.show');
+    // Profile (edit routes require auth)
     Route::get('/profile/edit', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::put('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::get('/profile/password/edit', [ProfileController::class, 'editPassword'])->name('profile.edit-password');

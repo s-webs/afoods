@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
@@ -44,5 +45,21 @@ class User extends Authenticatable implements MustVerifyEmail
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    /**
+     * Get the user's shopper record.
+     */
+    public function shopper(): HasOne
+    {
+        return $this->hasOne(Shopper::class);
+    }
+
+    /**
+     * Get or create shopper for this user.
+     */
+    public function getOrCreateShopper(): Shopper
+    {
+        return $this->shopper ?? Shopper::getOrCreate($this->id);
     }
 }

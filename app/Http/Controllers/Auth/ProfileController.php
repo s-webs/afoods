@@ -15,6 +15,10 @@ class ProfileController extends Controller
      */
     public function show()
     {
+        if (!auth()->check()) {
+            return view('auth.profile.guest');
+        }
+
         return view('auth.profile.show', [
             'user' => auth()->user(),
         ]);
