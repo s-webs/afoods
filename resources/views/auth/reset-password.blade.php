@@ -4,7 +4,7 @@
 <div class="container mx-auto px-2 xl:px-40">
     <div class="max-w-md mx-auto mt-10">
         <div class="bg-white rounded-2xl shadow-lg p-8">
-            <h2 class="text-2xl font-bold text-main-graphit mb-6 text-center">Регистрация</h2>
+            <h2 class="text-2xl font-bold text-main-graphit mb-6 text-center">Сброс пароля</h2>
 
             @if ($errors->any())
                 <div class="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg">
@@ -16,22 +16,10 @@
                 </div>
             @endif
 
-            <form method="POST" action="{{ route('register') }}">
+            <form method="POST" action="{{ route('password.update') }}">
                 @csrf
 
-                <div class="mb-4">
-                    <label for="name" class="block text-sm font-medium text-main-graphit mb-2">Имя</label>
-                    <input
-                        id="name"
-                        type="text"
-                        name="name"
-                        value="{{ old('name') }}"
-                        required
-                        autofocus
-                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-main focus:border-transparent outline-none transition"
-                        placeholder="Введите ваше имя"
-                    >
-                </div>
+                <input type="hidden" name="token" value="{{ $token }}">
 
                 <div class="mb-4">
                     <label for="email" class="block text-sm font-medium text-main-graphit mb-2">Email</label>
@@ -39,20 +27,21 @@
                         id="email"
                         type="email"
                         name="email"
-                        value="{{ old('email') }}"
+                        value="{{ $email }}"
                         required
-                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-main focus:border-transparent outline-none transition"
-                        placeholder="example@mail.com"
+                        readonly
+                        class="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 outline-none"
                     >
                 </div>
 
                 <div class="mb-4">
-                    <label for="password" class="block text-sm font-medium text-main-graphit mb-2">Пароль</label>
+                    <label for="password" class="block text-sm font-medium text-main-graphit mb-2">Новый пароль</label>
                     <input
                         id="password"
                         type="password"
                         name="password"
                         required
+                        autofocus
                         class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-main focus:border-transparent outline-none transition"
                         placeholder="Минимум 8 символов"
                     >
@@ -74,16 +63,9 @@
                     type="submit"
                     class="w-full bg-main text-white py-3 rounded-lg font-medium hover:bg-opacity-90 transition duration-200"
                 >
-                    Зарегистрироваться
+                    Сбросить пароль
                 </button>
             </form>
-
-            <div class="mt-6 text-center">
-                <p class="text-sm text-gray-600">
-                    Уже есть аккаунт?
-                    <a href="{{ route('login') }}" class="text-main font-medium hover:underline">Войти</a>
-                </p>
-            </div>
         </div>
     </div>
 </div>
