@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Models\Shopper;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules\Password;
@@ -29,8 +30,12 @@ class ProfileController extends Controller
      */
     public function edit()
     {
+        $user = auth()->user();
+        $shopper = $user->getOrCreateShopper();
+
         return view('auth.profile.edit', [
-            'user' => auth()->user(),
+            'user' => $user,
+            'shopper' => $shopper,
         ]);
     }
 
@@ -40,13 +45,23 @@ class ProfileController extends Controller
     public function update(Request $request)
     {
         $user = auth()->user();
+        $shopper = $user->getOrCreateShopper();
 
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email,' . $user->id],
+            'phone' => ['nullable', 'string', 'max:20'],
         ]);
 
-        $user->update($validated);
+        $user->update([
+            'name' => $validated['name'],
+            'email' => $validated['email'],
+        ]);
+
+        // Update phone in shopper
+        $shopper->update([
+            'phone' => $validated['phone'] ?? null,
+        ]);
 
         return redirect()->route('profile.show')->with('status', 'Профиль успешно обновлен!');
     }

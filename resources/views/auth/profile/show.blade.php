@@ -44,16 +44,25 @@
                     @endif
                 </div>
 
-                <div>
-                    <label class="block text-sm font-medium text-gray-500 mb-1">Дата регистрации</label>
-                    <p class="text-lg text-main-graphit">{{ $user->created_at->format('d.m.Y') }}</p>
-                </div>
-
                 @php
                     $shopper = $user->getOrCreateShopper();
                     $addresses = $shopper->addresses ?? [];
                     $defaultAddress = $shopper->getDefaultAddress();
                 @endphp
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-500 mb-1">Телефон</label>
+                    @if($shopper->phone)
+                        <p class="text-lg text-main-graphit">{{ $shopper->phone }}</p>
+                    @else
+                        <p class="text-sm text-gray-500">Не указан</p>
+                    @endif
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-500 mb-1">Дата регистрации</label>
+                    <p class="text-lg text-main-graphit">{{ $user->created_at->format('d.m.Y') }}</p>
+                </div>
 
                 <div class="pt-4 border-t border-gray-200">
                     <div class="flex items-center justify-between mb-3">

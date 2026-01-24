@@ -38,7 +38,10 @@
                         <span class="font-semibold">{{ $product->price_amount }} ₸</span>
                     </div>
                     <button
-                        class="bg-main-red text-white py-3.5 px-5 text-sm md:text-lg rounded-lg shadow-md cursor-pointer">
+                        type="button"
+                        class="add-to-cart bg-main-red text-white py-3.5 px-5 text-sm md:text-lg rounded-lg shadow-md cursor-pointer hover:bg-opacity-90 transition"
+                        data-product-id="{{ $product->id }}"
+                    >
                         <span class="font-semibold">Добавить в корзину</span>
                         <i class="ph-bold ph-shopping-cart-simple"></i>
                     </button>
@@ -61,7 +64,10 @@
                         <span class="text-green font-semibold">В наличии:</span><span class="ml-2.5">232</span>
                     </div>
                     <button
-                        class="bg-main-red text-white w-full py-3.5 mt-7.5 px-5 text-md lg:text-xl rounded-lg shadow-md cursor-pointer">
+                        type="button"
+                        class="add-to-cart bg-main-red text-white w-full py-3.5 mt-7.5 px-5 text-md lg:text-xl rounded-lg shadow-md cursor-pointer hover:bg-opacity-90 transition"
+                        data-product-id="{{ $product->id }}"
+                    >
                         <span class="font-semibold">Добавить в корзину</span>
                         <i class="ph-bold ph-shopping-cart-simple inline-block translate-y-0.5"></i>
                     </button>

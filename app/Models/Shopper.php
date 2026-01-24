@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Shopper extends Model
 {
@@ -109,5 +110,13 @@ class Shopper extends Model
         }
 
         return $addresses[0] ?? null;
+    }
+
+    /**
+     * Get the orders for the shopper.
+     */
+    public function sales(): HasMany
+    {
+        return $this->hasMany(Sale::class);
     }
 }

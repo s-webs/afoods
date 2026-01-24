@@ -27,8 +27,13 @@
         <div class="bg-main text-sm py-0.75 px-1.75 rounded-sm text-white font-semibold">
             <span>{{ $product->price_amount }} {{ $currency }}</span>
         </div>
-        <div class="cursor-pointer text-sm h-6.5 w-6.5 text-white text-center bg-main rounded-sm">
+        <button 
+            type="button"
+            class="add-to-cart cursor-pointer text-sm h-6.5 w-6.5 text-white text-center bg-main rounded-sm hover:bg-opacity-90 transition"
+            data-product-id="{{ $product->id }}"
+            title="Добавить в корзину"
+        >
             <i class="ph ph-plus translate-y-1.5 block"></i>
-        </div>
+        </button>
     </div>
 </div>

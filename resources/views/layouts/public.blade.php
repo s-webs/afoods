@@ -5,8 +5,10 @@
     <meta name="viewport"
           content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>Almaty-Foods</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <script src="{{ asset('js/cart.js') }}"></script>
 </head>
 <body>
 <header class="pt-3.75">
@@ -28,7 +30,7 @@
                 <div class="flex items-center flex-1 px-[20px] justify-between w-full">
                     <x-bottom-nav-item name="главная" icon="ph-bold ph-house"/>
                     <x-bottom-nav-item name="категории" route-name="categories.index" icon="ph-bold ph-list-bullets"/>
-                    <x-bottom-nav-item name="корзина" icon="ph-bold ph-basket"/>
+                    <x-bottom-nav-item name="корзина" route-name="cart.index" icon="ph-bold ph-basket"/>
                     @auth
                         <x-bottom-nav-item name="профиль" route-name="profile.show" icon="ph-bold ph-user"/>
                     @else

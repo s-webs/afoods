@@ -7,6 +7,7 @@ use App\Http\Controllers\Auth\PasswordResetController;
 use App\Http\Controllers\Auth\EmailVerificationController;
 use App\Http\Controllers\Auth\ProfileController;
 use App\Http\Controllers\Auth\AddressController;
+use App\Http\Controllers\CartController;
 
 // Public routes
 Route::get('/', [\App\Http\Controllers\Public\HomeController::class, 'index'])->name('home');
@@ -35,6 +36,17 @@ Route::get('/categories/{categorySlug}', [\App\Http\Controllers\Public\ProductsC
 
 // Profile route (accessible to all, shows stub for guests)
 Route::get('/profile', [ProfileController::class, 'show'])->name('profile.show');
+
+// Cart routes (accessible to all)
+Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
+Route::post('/cart/add', [CartController::class, 'add'])->name('cart.add');
+Route::put('/cart/{productId}', [CartController::class, 'update'])->name('cart.update');
+Route::delete('/cart/{productId}', [CartController::class, 'remove'])->name('cart.remove');
+Route::post('/cart/clear', [CartController::class, 'clear'])->name('cart.clear');
+Route::get('/cart/summary', [CartController::class, 'summary'])->name('cart.summary');
+Route::get('/cart/checkout', [CartController::class, 'checkout'])->name('cart.checkout');
+Route::post('/cart/process-order', [CartController::class, 'processOrder'])->name('cart.process-order');
+Route::get('/cart/success/{saleId}', [CartController::class, 'success'])->name('cart.success');
 
 // Authenticated routes
 Route::middleware('auth')->group(function () {

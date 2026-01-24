@@ -39,7 +39,7 @@
                     >
                 </div>
 
-                <div class="mb-6">
+                <div class="mb-4">
                     <label for="email" class="block text-sm font-medium text-main-graphit mb-2">Email</label>
                     <input 
                         id="email" 
@@ -50,6 +50,23 @@
                         class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-main focus:border-transparent outline-none transition"
                         placeholder="example@mail.com"
                     >
+                </div>
+
+                @php
+                    $shopper = $user->getOrCreateShopper();
+                @endphp
+
+                <div class="mb-6">
+                    <label for="phone" class="block text-sm font-medium text-main-graphit mb-2">Телефон</label>
+                    <input 
+                        id="phone" 
+                        type="tel" 
+                        name="phone" 
+                        value="{{ old('phone', $shopper->phone) }}" 
+                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-main focus:border-transparent outline-none transition"
+                        placeholder="+7 (700) 123-45-67"
+                    >
+                    <p class="text-xs text-gray-500 mt-1">Необязательное поле</p>
                 </div>
 
                 <div class="flex gap-3">
