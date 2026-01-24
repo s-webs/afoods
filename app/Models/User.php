@@ -60,6 +60,10 @@ class User extends Authenticatable implements MustVerifyEmail
      */
     public function getOrCreateShopper(): Shopper
     {
-        return $this->shopper ?? Shopper::getOrCreate($this->id);
+        if (!$this->shopper) {
+            return Shopper::getOrCreate($this->id);
+        }
+        
+        return $this->shopper;
     }
 }

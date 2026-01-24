@@ -49,6 +49,47 @@
                     <p class="text-lg text-main-graphit">{{ $user->created_at->format('d.m.Y') }}</p>
                 </div>
 
+                @php
+                    $shopper = $user->getOrCreateShopper();
+                    $addresses = $shopper->addresses ?? [];
+                    $defaultAddress = $shopper->getDefaultAddress();
+                @endphp
+
+                <div class="pt-4 border-t border-gray-200">
+                    <div class="flex items-center justify-between mb-3">
+                        <label class="block text-sm font-medium text-gray-500">Адреса доставки</label>
+                        <a href="{{ route('profile.addresses.index') }}" class="text-main hover:underline text-sm font-medium">
+                            Управление адресами
+                        </a>
+                    </div>
+                    @if($defaultAddress)
+                        <div class="bg-halftone rounded-lg p-3 mt-2">
+                            <p class="text-sm font-medium text-main-graphit">{{ $defaultAddress['address'] ?? '' }}</p>
+                            @if($defaultAddress['house'] ?? null)
+                                <p class="text-xs text-gray-600 mt-1">
+                                    Дом: {{ $defaultAddress['house'] }}
+                                    @if($defaultAddress['apartment'] ?? null), кв. {{ $defaultAddress['apartment'] }}@endif
+                                </p>
+                            @endif
+                            <span class="inline-block mt-2 text-xs bg-main text-white px-2 py-1 rounded">По умолчанию</span>
+                        </div>
+                    @elseif(count($addresses) > 0)
+                        <div class="bg-gray-50 rounded-lg p-3 mt-2">
+                            <p class="text-sm text-gray-600">У вас {{ count($addresses) }} {{ count($addresses) === 1 ? 'адрес' : 'адресов' }}</p>
+                            <a href="{{ route('profile.addresses.index') }}" class="text-main hover:underline text-xs mt-1 inline-block">
+                                Выбрать адрес по умолчанию
+                            </a>
+                        </div>
+                    @else
+                        <div class="bg-gray-50 rounded-lg p-3 mt-2">
+                            <p class="text-sm text-gray-600 mb-2">Адреса не добавлены</p>
+                            <a href="{{ route('profile.addresses.create') }}" class="text-main hover:underline text-sm font-medium">
+                                Добавить адрес
+                            </a>
+                        </div>
+                    @endif
+                </div>
+
                 <div class="pt-4 border-t border-gray-200">
                     <a href="{{ route('profile.edit-password') }}" class="text-main hover:underline text-sm font-medium">
                         Изменить пароль

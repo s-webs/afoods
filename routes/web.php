@@ -6,6 +6,7 @@ use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Auth\PasswordResetController;
 use App\Http\Controllers\Auth\EmailVerificationController;
 use App\Http\Controllers\Auth\ProfileController;
+use App\Http\Controllers\Auth\AddressController;
 
 // Public routes
 Route::get('/', [\App\Http\Controllers\Public\HomeController::class, 'index'])->name('home');
@@ -45,6 +46,15 @@ Route::middleware('auth')->group(function () {
     Route::put('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::get('/profile/password/edit', [ProfileController::class, 'editPassword'])->name('profile.edit-password');
     Route::put('/profile/password', [ProfileController::class, 'updatePassword'])->name('profile.password.update');
+
+    // Addresses
+    Route::get('/profile/addresses', [AddressController::class, 'index'])->name('profile.addresses.index');
+    Route::get('/profile/addresses/create', [AddressController::class, 'create'])->name('profile.addresses.create');
+    Route::post('/profile/addresses', [AddressController::class, 'store'])->name('profile.addresses.store');
+    Route::get('/profile/addresses/{addressId}/edit', [AddressController::class, 'edit'])->name('profile.addresses.edit');
+    Route::put('/profile/addresses/{addressId}', [AddressController::class, 'update'])->name('profile.addresses.update');
+    Route::delete('/profile/addresses/{addressId}', [AddressController::class, 'destroy'])->name('profile.addresses.destroy');
+    Route::post('/profile/addresses/{addressId}/set-default', [AddressController::class, 'setDefault'])->name('profile.addresses.set-default');
 
     // Email verification
     Route::get('/email/verify', [EmailVerificationController::class, 'notice'])->name('verification.notice');
