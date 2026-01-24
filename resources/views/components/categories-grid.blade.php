@@ -1,9 +1,5 @@
 <div class="grid gap-4
-                    grid-cols-1
-                    min-[321px]:grid-cols-3
-                    md:grid-cols-[repeat(auto-fit,240px)]
-                    2xl:grid-cols-[repeat(auto-fit,288px)]
-                    3xl:grid-cols-[repeat(auto-fit,291px)]
-                    md:justify-center">
+  grid-cols-[repeat(auto-fit,minmax(98px,1fr))]
+  lg:grid-cols-[repeat(auto-fit,minmax(150px,1fr))]">
     {{ $slot }}
 </div>

@@ -19,8 +19,9 @@ class ProductsController extends Controller
 
     public function show($productSlug)
     {
-        dd($productSlug);
         $product = Product::query()->where('slug', $productSlug)->firstOrFail();
-        dd($product);
+        $products = Product::all()->take(5);
+
+        return view('pages.products.show', compact('product', 'products'));
     }
 }

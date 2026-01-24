@@ -1,19 +1,19 @@
-<div class="p-3.75 w-full h-full rounded-sm shadow-md flex flex-col">
+<div class="p-3.75 w-full h-full rounded-sm shadow-md flex flex-col border border-gray-100">
     @php
         $firstImage = data_get($product, 'images.0');
     @endphp
 
     <div class="w-full aspect-square overflow-hidden rounded-sm">
         <img
-            src="{{ $firstImage ? asset($firstImage) : asset('images/placeholder.png') }}"
+            src="{{ $firstImage ? asset($firstImage) : asset('assets/images/placeholder.png') }}"
             alt="{{ $product->name }}"
             class="w-full h-full object-cover"
         >
     </div>
 
     <div class="mt-1.75">
-        <a href="{{ route('products.show', $product->slug) }}" class="text-md font-semibold text-main-graphit">
-            {{ $product->name }}
+        <a href="{{ route('products.show', $product->slug) }}" class="text-sm md:text-md font-semibold text-main-graphit">
+            {{ \Illuminate\Support\Str::limit($product->name, 38, '...') }}
         </a>
     </div>
 
