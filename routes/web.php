@@ -8,6 +8,7 @@ use App\Http\Controllers\Auth\EmailVerificationController;
 use App\Http\Controllers\Auth\ProfileController;
 use App\Http\Controllers\Auth\AddressController;
 use App\Http\Controllers\CartController;
+use App\Http\Controllers\OrderSearchController;
 
 // Public routes
 Route::get('/', [\App\Http\Controllers\Public\HomeController::class, 'index'])->name('home');
@@ -37,6 +38,11 @@ Route::get('/categories/{categorySlug}', [\App\Http\Controllers\Public\ProductsC
 // Profile route (accessible to all, shows stub for guests)
 Route::get('/profile', [ProfileController::class, 'show'])->name('profile.show');
 
+// Order search (accessible to all, including guests) - must be before /orders/{saleId}
+Route::get('/orders/search', [OrderSearchController::class, 'index'])->name('orders.search');
+Route::post('/orders/search', [OrderSearchController::class, 'search'])->name('orders.search.submit');
+Route::get('/orders/{saleId}', [OrderSearchController::class, 'show'])->name('orders.show');
+
 // Cart routes (accessible to all)
 Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
 Route::post('/cart/add', [CartController::class, 'add'])->name('cart.add');
@@ -44,6 +50,7 @@ Route::put('/cart/{productId}', [CartController::class, 'update'])->name('cart.u
 Route::delete('/cart/{productId}', [CartController::class, 'remove'])->name('cart.remove');
 Route::post('/cart/clear', [CartController::class, 'clear'])->name('cart.clear');
 Route::get('/cart/summary', [CartController::class, 'summary'])->name('cart.summary');
+Route::post('/cart/calculate-delivery', [CartController::class, 'calculateDelivery'])->name('cart.calculate-delivery');
 Route::get('/cart/checkout', [CartController::class, 'checkout'])->name('cart.checkout');
 Route::post('/cart/process-order', [CartController::class, 'processOrder'])->name('cart.process-order');
 Route::get('/cart/success/{saleId}', [CartController::class, 'success'])->name('cart.success');
@@ -58,6 +65,10 @@ Route::middleware('auth')->group(function () {
     Route::put('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::get('/profile/password/edit', [ProfileController::class, 'editPassword'])->name('profile.edit-password');
     Route::put('/profile/password', [ProfileController::class, 'updatePassword'])->name('profile.password.update');
+    
+    // Orders
+    Route::get('/profile/orders', [ProfileController::class, 'orders'])->name('profile.orders');
+    Route::get('/profile/orders/{saleId}', [ProfileController::class, 'orderShow'])->name('profile.order.show');
 
     // Addresses
     Route::get('/profile/addresses', [AddressController::class, 'index'])->name('profile.addresses.index');

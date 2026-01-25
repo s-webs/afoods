@@ -9,13 +9,50 @@
     <title>Almaty-Foods</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <script src="{{ asset('js/cart.js') }}"></script>
+    <style>
+        /* Animation for quantity change */
+        .quantity-animate {
+            animation: quantityPulse 0.3s ease-in-out;
+        }
+        
+        @keyframes quantityPulse {
+            0% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.2);
+                color: var(--main-color, #4B9DCB);
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
+        
+        /* Smooth transitions for cart controls */
+        .cart-quantity-display {
+            transition: all 0.2s ease-in-out;
+        }
+    </style>
 </head>
 <body>
 <header class="pt-3.75">
-    <div class="">
-        <a href="{{ route('home') }}" class="">
-            <img src="/assets/images/logo.png" alt="almaty-foods logo" class="w-45 mx-auto">
-        </a>
+    <div class="container mx-auto px-4">
+        <div class="flex items-center justify-between relative">
+            <div class="flex-1"></div>
+            <a href="{{ route('home') }}" class="absolute left-1/2 transform -translate-x-1/2">
+                <img src="/assets/images/logo.png" alt="almaty-foods logo" class="w-45">
+            </a>
+            <div class="flex-1 flex justify-end">
+                <a
+                    href="{{ route('orders.search') }}"
+                    class="flex items-center gap-2 text-main hover:text-opacity-80 transition text-sm md:text-base font-medium"
+                    title="Поиск заказов"
+                >
+                    <i class="ph-bold ph-magnifying-glass text-xl"></i>
+                    <span class="hidden md:inline">Поиск заказов</span>
+                </a>
+            </div>
+        </div>
     </div>
 </header>
 @yield('content')

@@ -192,6 +192,19 @@
                                         </a>
                                     </div>
                                 @endif
+
+                                <!-- Yandex Delivery Widget -->
+                                <div id="yandex-delivery-widget" class="mt-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
+                                    <h4 class="text-sm font-semibold text-main-graphit mb-3 flex items-center gap-2">
+                                        <i class="ph-bold ph-truck text-main"></i>
+                                        Доставка Яндекс Доставкой
+                                    </h4>
+                                    <div id="delivery-options" class="space-y-2">
+                                        <div id="delivery-results" class="space-y-2">
+                                            <p class="text-sm text-gray-600">Выберите адрес на карте для расчета стоимости доставки</p>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
 
                             <!-- Order Notes -->
@@ -262,7 +275,7 @@ document.addEventListener('DOMContentLoaded', function() {
     addressSelect.addEventListener('change', function() {
         const selectedId = this.value;
         
-        if (selectedId === 'new' || selectedId === '') {
+            if (selectedId === 'new' || selectedId === '') {
             // Clear fields for new address
             document.getElementById('delivery_address_address').value = '';
             document.getElementById('delivery_address_latitude').value = '';
@@ -273,6 +286,12 @@ document.addEventListener('DOMContentLoaded', function() {
             document.getElementById('delivery_address_floor').value = '';
             document.getElementById('delivery_address_notes').value = '';
             document.getElementById('address_search').value = '';
+            
+            // Clear delivery results
+            const deliveryResults = document.getElementById('delivery-results');
+            if (deliveryResults) {
+                deliveryResults.innerHTML = '<p class="text-sm text-gray-600">Выберите адрес на карте для расчета стоимости доставки</p>';
+            }
             
             // Clear map
             if (window.checkoutMap && window.checkoutPlacemark) {
@@ -305,6 +324,13 @@ document.addEventListener('DOMContentLoaded', function() {
                         window.createCheckoutPlacemark(coords);
                     } else if (window.createPlacemark) {
                         window.createPlacemark(coords);
+                    }
+                    
+                    // Calculate delivery for selected address
+                    if (typeof window.calculateDeliveryForAddress === 'function') {
+                        window.calculateDeliveryForAddress(parseFloat(address.latitude), parseFloat(address.longitude));
+                    } else if (typeof calculateDeliveryForAddress === 'function') {
+                        calculateDeliveryForAddress(parseFloat(address.latitude), parseFloat(address.longitude));
                     }
                 }
             }

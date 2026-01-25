@@ -3,6 +3,7 @@
 namespace App\View\Components;
 
 use App\Models\Product;
+use App\Services\CartService;
 use Closure;
 use Illuminate\Contracts\View\View;
 use Illuminate\View\Component;
@@ -12,6 +13,7 @@ class ProductCard extends Component
     public Product $product;
     public string $units;
     public string $currency;
+    public int $cartQuantity;
 
     public function __construct(
         Product $product,
@@ -22,6 +24,7 @@ class ProductCard extends Component
         $this->product = $product;
         $this->units = $units;
         $this->currency = $currency;
+        $this->cartQuantity = CartService::getProductQuantity($product->id);
     }
 
     /**

@@ -26,15 +26,15 @@
                             $product = $item['product'];
                             $firstImage = data_get($product->images, '0');
                         @endphp
-                        <div class="border border-gray-200 rounded-lg p-4 flex items-center gap-4">
-                            <div class="w-20 h-20 flex-shrink-0 rounded-lg overflow-hidden">
-                                <img 
-                                    src="{{ $firstImage ? asset($firstImage) : asset('assets/images/placeholder.png') }}" 
+                        <div class="border border-gray-200 rounded-lg p-4 flex items-center flex-wrap gap-4">
+                            <div class="w-20 h-20 shrink-0 rounded-lg overflow-hidden">
+                                <img
+                                    src="{{ $firstImage ? asset($firstImage) : asset('assets/images/placeholder.png') }}"
                                     alt="{{ $product->name }}"
                                     class="w-full h-full object-cover"
                                 >
                             </div>
-                            
+
                             <div class="flex-1 min-w-0">
                                 <h3 class="font-semibold text-main-graphit mb-1">
                                     <a href="{{ route('products.show', $product->slug) }}" class="hover:text-main">
@@ -48,9 +48,9 @@
 
                             <div class="flex items-center gap-3">
                                 <div class="flex items-center border border-gray-300 rounded-lg">
-                                    <button 
+                                    <button
                                         type="button"
-                        class="px-3 py-1 text-main hover:bg-halftone transition decrease-quantity" 
+                        class="px-3 py-1 text-main hover:bg-halftone transition decrease-quantity"
                                         data-product-id="{{ $product->id }}"
                                     >
                                         <i class="ph-bold ph-minus"></i>
@@ -58,7 +58,7 @@
                                     <span class="px-4 py-1 min-w-[3rem] text-center quantity-display" data-product-id="{{ $product->id }}">
                                         {{ $item['quantity'] }}
                                     </span>
-                                    <button 
+                                    <button
                                         type="button"
                                         class="px-3 py-1 text-main hover:bg-halftone transition increase-quantity"
                                         data-product-id="{{ $product->id }}"
@@ -73,7 +73,7 @@
                                     </p>
                                 </div>
 
-                                <button 
+                                <button
                                     type="button"
                                     class="text-red-600 hover:text-red-700 p-2 remove-item"
                                     data-product-id="{{ $product->id }}"
@@ -93,14 +93,14 @@
                     </div>
 
                     <div class="flex gap-3">
-                        <a 
-                            href="{{ route('home') }}" 
+                        <a
+                            href="{{ route('home') }}"
                             class="flex-1 bg-gray-200 text-gray-700 py-3 rounded-lg font-medium hover:bg-gray-300 transition duration-200 text-center"
                         >
                             Продолжить покупки
                         </a>
-                        <a 
-                            href="{{ route('cart.checkout') }}" 
+                        <a
+                            href="{{ route('cart.checkout') }}"
                             class="flex-1 bg-main text-white py-3 rounded-lg font-medium hover:bg-opacity-90 transition duration-200 text-center"
                         >
                             Оформить заказ

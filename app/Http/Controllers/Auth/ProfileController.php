@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Models\Shopper;
+use App\Models\Sale;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules\Password;
@@ -20,8 +21,18 @@ class ProfileController extends Controller
             return view('auth.profile.guest');
         }
 
+        $user = auth()->user();
+        $shopper = $user->getOrCreateShopper();
+        
+        // Get user's orders (sales) through shopper
+        $sales = Sale::where('shopper_id', $shopper->id)
+            ->orderBy('date', 'desc')
+            ->limit(10)
+            ->get();
+
         return view('auth.profile.show', [
-            'user' => auth()->user(),
+            'user' => $user,
+            'sales' => $sales,
         ]);
     }
 
@@ -89,5 +100,39 @@ class ProfileController extends Controller
         ]);
 
         return redirect()->route('profile.show')->with('status', 'Пароль успешно изменен!');
+    }
+
+    /**
+     * Show order history page.
+     */
+    public function orders()
+    {
+        $user = auth()->user();
+        $shopper = $user->getOrCreateShopper();
+        
+        $sales = Sale::where('shopper_id', $shopper->id)
+            ->orderBy('date', 'desc')
+            ->paginate(15);
+
+        return view('auth.profile.orders', [
+            'sales' => $sales,
+        ]);
+    }
+
+    /**
+     * Show order details.
+     */
+    public function orderShow(int $saleId)
+    {
+        $user = auth()->user();
+        $shopper = $user->getOrCreateShopper();
+        
+        $sale = Sale::where('id', $saleId)
+            ->where('shopper_id', $shopper->id)
+            ->firstOrFail();
+
+        return view('auth.profile.order-show', [
+            'sale' => $sale,
+        ]);
     }
 }

@@ -27,13 +27,37 @@
         <div class="bg-main text-sm py-0.75 px-1.75 rounded-sm text-white font-semibold">
             <span>{{ $product->price_amount }} {{ $currency }}</span>
         </div>
-        <button 
-            type="button"
-            class="add-to-cart cursor-pointer text-sm h-6.5 w-6.5 text-white text-center bg-main rounded-sm hover:bg-opacity-90 transition"
-            data-product-id="{{ $product->id }}"
-            title="Добавить в корзину"
-        >
-            <i class="ph ph-plus translate-y-1.5 block"></i>
-        </button>
+        @if($cartQuantity > 0)
+            <div class="flex items-center border border-main rounded-sm">
+                <button
+                    type="button"
+                    class="cart-decrease text-sm h-6.5 w-6.5 text-main hover:bg-main hover:text-white transition flex items-center justify-center"
+                    data-product-id="{{ $product->id }}"
+                    title="Уменьшить количество"
+                >
+                    <i class="ph-bold ph-minus text-xs"></i>
+                </button>
+                <span class="cart-quantity-display px-2 text-sm font-semibold text-main min-w-[1.5rem] text-center" data-product-id="{{ $product->id }}">
+                    {{ $cartQuantity }}
+                </span>
+                <button
+                    type="button"
+                    class="cart-increase text-sm h-6.5 w-6.5 text-main hover:bg-main hover:text-white transition flex items-center justify-center"
+                    data-product-id="{{ $product->id }}"
+                    title="Увеличить количество"
+                >
+                    <i class="ph-bold ph-plus text-xs"></i>
+                </button>
+            </div>
+        @else
+            <button
+                type="button"
+                class="add-to-cart cursor-pointer text-sm h-6.5 w-6.5 text-white text-center bg-main rounded-sm hover:bg-opacity-90 transition"
+                data-product-id="{{ $product->id }}"
+                title="Добавить в корзину"
+            >
+                <i class="ph ph-plus block"></i>
+            </button>
+        @endif
     </div>
 </div>

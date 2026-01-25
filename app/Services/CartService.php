@@ -149,6 +149,17 @@ class CartService
     }
 
     /**
+     * Get quantity of specific product in cart.
+     */
+    public static function getProductQuantity(int $productId): int
+    {
+        $items = self::getItems();
+        $index = self::findItemIndex($items, $productId);
+        
+        return $index !== false ? $items[$index]['quantity'] : 0;
+    }
+
+    /**
      * Check if cart is empty.
      */
     public static function isEmpty(): bool

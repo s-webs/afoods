@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Services\CartService;
+use App\Services\YandexDeliveryService;
 use App\Models\Product;
 use App\Models\Shopper;
 use App\Models\Sale;
@@ -232,6 +233,41 @@ class CartController extends Controller
 
         return redirect()->route('cart.success', $sale->id)
             ->with('status', 'Заказ успешно оформлен!');
+    }
+
+    /**
+     * Calculate delivery cost.
+     */
+    public function calculateDelivery(Request $request)
+    {
+        $validated = $request->validate([
+            'from_latitude' => ['required', 'numeric'],
+            'from_longitude' => ['required', 'numeric'],
+            'to_latitude' => ['required', 'numeric'],
+            'to_longitude' => ['required', 'numeric'],
+        ]);
+
+        $deliveryService = new YandexDeliveryService();
+        $options = $deliveryService->getDeliveryOptions(
+            [$validated['from_latitude'], $validated['from_longitude']],
+            [$validated['to_latitude'], $validated['to_longitude']]
+        );
+
+        \Log::info('Delivery calculation result', [
+            'from' => [$validated['from_latitude'], $validated['from_longitude']],
+            'to' => [$validated['to_latitude'], $validated['to_longitude']],
+            'options_count' => count($options),
+            'options' => $options,
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'options' => $options,
+            'debug' => [
+                'from' => [$validated['from_latitude'], $validated['from_longitude']],
+                'to' => [$validated['to_latitude'], $validated['to_longitude']],
+            ],
+        ]);
     }
 
     /**

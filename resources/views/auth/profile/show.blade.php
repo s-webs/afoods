@@ -100,6 +100,47 @@
                 </div>
 
                 <div class="pt-4 border-t border-gray-200">
+                    <div class="flex items-center justify-between mb-3">
+                        <label class="block text-sm font-medium text-gray-500">История заказов</label>
+                        @if(count($sales) > 0)
+                            <a href="{{ route('profile.orders') }}" class="text-main hover:underline text-sm font-medium">
+                                Все заказы
+                            </a>
+                        @endif
+                    </div>
+                    @if(count($sales) > 0)
+                        <div class="space-y-3 mt-3">
+                            @foreach($sales->take(5) as $sale)
+                                <a href="{{ route('profile.order.show', $sale->id) }}" class="block bg-gray-50 rounded-lg p-4 hover:bg-gray-100 transition">
+                                    <div class="flex items-center justify-between">
+                                        <div>
+                                            <p class="text-sm font-semibold text-main-graphit">Заказ #{{ $sale->receipt_number }}</p>
+                                            <p class="text-xs text-gray-600 mt-1">{{ $sale->date->format('d.m.Y H:i') }}</p>
+                                        </div>
+                                        <div class="text-right">
+                                            <p class="text-sm font-bold text-main">{{ $sale->total_price }} ₸</p>
+                                            <p class="text-xs text-gray-600 mt-1">{{ count($sale->items) }} {{ count($sale->items) === 1 ? 'товар' : 'товаров' }}</p>
+                                        </div>
+                                    </div>
+                                </a>
+                            @endforeach
+                            @if(count($sales) > 5)
+                                <a href="{{ route('profile.orders') }}" class="block text-center text-sm text-main hover:underline mt-2">
+                                    Показать все заказы ({{ count($sales) }})
+                                </a>
+                            @endif
+                        </div>
+                    @else
+                        <div class="bg-gray-50 rounded-lg p-4 mt-2">
+                            <p class="text-sm text-gray-600">У вас пока нет заказов</p>
+                            <a href="{{ route('home') }}" class="text-main hover:underline text-sm font-medium mt-2 inline-block">
+                                Начать покупки
+                            </a>
+                        </div>
+                    @endif
+                </div>
+
+                <div class="pt-4 border-t border-gray-200">
                     <a href="{{ route('profile.edit-password') }}" class="text-main hover:underline text-sm font-medium">
                         Изменить пароль
                     </a>
