@@ -70,7 +70,7 @@ return [
     'auth' => [
         'enabled' => true,
         'guard' => 'moonshine',
-        'model' => MoonshineUser::class,
+        'model' => \App\Models\MoonshineUser::class,
         'middleware' => [
             Authenticate::class,
         ],

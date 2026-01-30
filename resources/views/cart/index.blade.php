@@ -48,39 +48,51 @@
 
                             <div class="flex items-center gap-3">
                                 <div class="flex items-center border border-gray-300 rounded-lg">
-                                    <button
-                                        type="button"
-                        class="px-3 py-1 text-main hover:bg-halftone transition decrease-quantity"
-                                        data-product-id="{{ $product->id }}"
-                                    >
-                                        <i class="ph-bold ph-minus"></i>
-                                    </button>
-                                    <span class="px-4 py-1 min-w-[3rem] text-center quantity-display" data-product-id="{{ $product->id }}">
+                                    <form action="{{ route('cart.update', $product->id) }}" method="POST" class="inline">
+                                        @csrf
+                                        @method('PUT')
+                                        <input type="hidden" name="quantity" value="{{ max(1, $item['quantity'] - 1) }}">
+                                        <button
+                                            type="submit"
+                                            class="px-3 py-1 text-main hover:bg-halftone transition"
+                                            @if($item['quantity'] <= 1) disabled @endif
+                                        >
+                                            <i class="ph-bold ph-minus"></i>
+                                        </button>
+                                    </form>
+                                    <span class="px-4 py-1 min-w-[3rem] text-center">
                                         {{ $item['quantity'] }}
                                     </span>
-                                    <button
-                                        type="button"
-                                        class="px-3 py-1 text-main hover:bg-halftone transition increase-quantity"
-                                        data-product-id="{{ $product->id }}"
-                                    >
-                                        <i class="ph-bold ph-plus"></i>
-                                    </button>
+                                    <form action="{{ route('cart.update', $product->id) }}" method="POST" class="inline">
+                                        @csrf
+                                        @method('PUT')
+                                        <input type="hidden" name="quantity" value="{{ $item['quantity'] + 1 }}">
+                                        <button
+                                            type="submit"
+                                            class="px-3 py-1 text-main hover:bg-halftone transition"
+                                        >
+                                            <i class="ph-bold ph-plus"></i>
+                                        </button>
+                                    </form>
                                 </div>
 
                                 <div class="text-right min-w-[100px]">
-                                    <p class="font-semibold text-main-graphit item-total" data-product-id="{{ $product->id }}">
+                                    <p class="font-semibold text-main-graphit">
                                         {{ $item['total'] }} ₸
                                     </p>
                                 </div>
 
-                                <button
-                                    type="button"
-                                    class="text-red-600 hover:text-red-700 p-2 remove-item"
-                                    data-product-id="{{ $product->id }}"
-                                    title="Удалить"
-                                >
-                                    <i class="ph-bold ph-trash text-xl"></i>
-                                </button>
+                                <form action="{{ route('cart.destroy', $product->id) }}" method="POST" class="inline" onsubmit="return confirm('Удалить товар из корзины?')">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button
+                                        type="submit"
+                                        class="text-red-600 hover:text-red-700 p-2"
+                                        title="Удалить"
+                                    >
+                                        <i class="ph-bold ph-trash text-xl"></i>
+                                    </button>
+                                </form>
                             </div>
                         </div>
                     @endforeach
@@ -119,86 +131,4 @@
         </div>
     </div>
 </div>
-
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Increase quantity
-    document.querySelectorAll('.increase-quantity').forEach(button => {
-        button.addEventListener('click', function() {
-            const productId = this.dataset.productId;
-            const quantityDisplay = document.querySelector(`.quantity-display[data-product-id="${productId}"]`);
-            const currentQuantity = parseInt(quantityDisplay.textContent);
-            updateQuantity(productId, currentQuantity + 1);
-        });
-    });
-
-    // Decrease quantity
-    document.querySelectorAll('.decrease-quantity').forEach(button => {
-        button.addEventListener('click', function() {
-            const productId = this.dataset.productId;
-            const quantityDisplay = document.querySelector(`.quantity-display[data-product-id="${productId}"]`);
-            const currentQuantity = parseInt(quantityDisplay.textContent);
-            if (currentQuantity > 1) {
-                updateQuantity(productId, currentQuantity - 1);
-            }
-        });
-    });
-
-    // Remove item
-    document.querySelectorAll('.remove-item').forEach(button => {
-        button.addEventListener('click', function() {
-            if (confirm('Удалить товар из корзины?')) {
-                const productId = this.dataset.productId;
-                removeItem(productId);
-            }
-        });
-    });
-
-    function updateQuantity(productId, quantity) {
-        fetch(`/cart/${productId}`, {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || ''
-            },
-            body: JSON.stringify({ quantity: quantity })
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                document.querySelector(`.quantity-display[data-product-id="${productId}"]`).textContent = quantity;
-                document.querySelector(`.item-total[data-product-id="${productId}"]`).textContent = data.item_total + ' ₸';
-                document.querySelector('.cart-total').textContent = data.cart_total + ' ₸';
-            } else {
-                alert(data.message || 'Ошибка при обновлении количества');
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            alert('Ошибка при обновлении количества');
-        });
-    }
-
-    function removeItem(productId) {
-        fetch(`/cart/${productId}`, {
-            method: 'DELETE',
-            headers: {
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || ''
-            }
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                location.reload();
-            } else {
-                alert(data.message || 'Ошибка при удалении товара');
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            alert('Ошибка при удалении товара');
-        });
-    }
-});
-</script>
 @endsection

@@ -14,7 +14,8 @@ return new class extends Migration {
             $table->id();
             $table->integer('category_id')->nullable();
             $table->string('name');
-            $table->string('barcode')->unique();
+            $table->string('new_name')->nullable();
+            $table->string('barcode')->unique()->nullable();
             $table->jsonb('images')->nullable();
             $table->longText('description')->nullable();
             $table->jsonb('specs')->nullable();
@@ -24,6 +25,7 @@ return new class extends Migration {
             $table->integer('quantity')->default(0);
             $table->jsonb('obj')->nullable();
             $table->string('slug')->nullable();
+            $table->string('fetch_status')->default('not_found');
             $table->timestamps();
         });
     }

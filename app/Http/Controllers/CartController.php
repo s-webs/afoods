@@ -134,7 +134,7 @@ class CartController extends Controller
     public function checkout()
     {
         $items = CartService::getItemsWithProducts();
-        
+
         if (empty($items)) {
             return redirect()->route('cart.index')
                 ->with('error', 'Корзина пуста');
@@ -150,7 +150,6 @@ class CartController extends Controller
 
         if (auth()->check()) {
             $user = auth()->user();
-            $shopper = $user->getOrCreateShopper();
             $addresses = $shopper->addresses ?? [];
             $defaultAddress = $shopper->getDefaultAddress();
         }
@@ -172,7 +171,7 @@ class CartController extends Controller
     public function processOrder(Request $request)
     {
         $items = CartService::getItemsWithProducts();
-        
+
         if (empty($items)) {
             return redirect()->route('cart.index')
                 ->with('error', 'Корзина пуста');
@@ -200,7 +199,7 @@ class CartController extends Controller
         if (auth()->check()) {
             $user = auth()->user();
             $shopper = $user->getOrCreateShopper();
-            
+
             // Update shopper phone if provided
             if ($validated['phone']) {
                 $shopper->update(['phone' => $validated['phone']]);
@@ -221,7 +220,6 @@ class CartController extends Controller
         $sale = Sale::create([
             'cashier_id' => null, // Will be filled later
             'shift_id' => null, // Will be filled later
-            'shopper_id' => $shopper->id,
             'date' => now(),
             'receipt_number' => $receiptNumber,
             'items' => $items,

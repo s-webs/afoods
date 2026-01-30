@@ -50,6 +50,7 @@ class ProductFormPage extends FormPage
                        Column::make([
                            Text::make('Штрих-код / Артикул', 'barcode'),
                            Text::make('Название', 'name'),
+                           Text::make('Название (NEW)', 'new_name'),
                            Image::make('Картинки', 'images')
                                ->disk('public')
                                ->dir('uploads/products')

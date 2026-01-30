@@ -42,6 +42,7 @@ class ProductIndexPage extends IndexPage
             BelongsTo::make('Категория', 'category', 'name', resource: CategoryResource::class)->badge('green')->sortable(),
             Text::make('Штрих-код / Артикул', 'barcode')->badge('purple'),
             Text::make('Название', 'name'),
+            Text::make('Название NEW', 'new_name'),
             Number::make('Текущая цена', 'price_amount')->badge('yellow')->sortable(),
             Number::make('Цена со скидкой', 'sale_price_amount')->badge('red')->sortable(),
             Number::make('Количество в наличии', 'quantity')->badge('blue')->sortable(),

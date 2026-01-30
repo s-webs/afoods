@@ -12,8 +12,9 @@
     </div>
 
     <div class="mt-1.75">
-        <a href="{{ route('products.show', $product->slug) }}" class="text-sm md:text-md font-semibold text-main-graphit">
-            {{ \Illuminate\Support\Str::limit($product->name, 38, '...') }}
+        <a href="{{ route('products.show', $product->slug) }}"
+           class="text-sm md:text-md font-semibold text-main-graphit">
+            {{ \Illuminate\Support\Str::limit($product->new_name ? $product->new_name : $product->name, 38, '...') }}
         </a>
     </div>
 
@@ -37,7 +38,8 @@
                 >
                     <i class="ph-bold ph-minus text-xs"></i>
                 </button>
-                <span class="cart-quantity-display px-2 text-sm font-semibold text-main min-w-[1.5rem] text-center" data-product-id="{{ $product->id }}">
+                <span class="cart-quantity-display px-2 text-sm font-semibold text-main min-w-[1.5rem] text-center"
+                      data-product-id="{{ $product->id }}">
                     {{ $cartQuantity }}
                 </span>
                 <button

@@ -36,6 +36,6 @@ class ProductResource extends ModelResource
 
     protected function search(): array
     {
-        return ['id', 'name', 'barcode'];
+        return ['id', 'name', 'new_name', 'barcode'];
     }
 }
