@@ -98,6 +98,21 @@ return [
             'sslmode' => env('DB_SSLMODE', 'prefer'),
         ],
 
+        'pgsql_external' => [
+            'driver' => 'pgsql',
+            'url' => env('DB_EXTERNAL_URL'),
+            'host' => env('DB_EXTERNAL_HOST', '127.0.0.1'),
+            'port' => env('DB_EXTERNAL_PORT', '5432'),
+            'database' => env('DB_EXTERNAL_DATABASE', 'laravel'),
+            'username' => env('DB_EXTERNAL_USERNAME', 'root'),
+            'password' => env('DB_EXTERNAL_PASSWORD', ''),
+            'charset' => env('DB_CHARSET', 'utf8'),
+            'prefix' => '',
+            'prefix_indexes' => true,
+            'search_path' => 'public',
+            'sslmode' => env('DB_SSLMODE', 'prefer'),
+        ],
+
         'sqlsrv' => [
             'driver' => 'sqlsrv',
             'url' => env('DB_URL'),
