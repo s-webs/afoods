@@ -407,6 +407,222 @@ Authorization: Bearer {token}
 
 ---
 
+### 6. Установить скидку на товар
+**POST** `/api/v1/products-api/{id}/discount`
+
+**Требуется авторизация:** Да
+
+**Content-Type:** `application/json`
+
+**Поля запроса:**
+- `discount_type` (string, **required**) - тип скидки: `percent` (процент) или `fixed` (фиксированная сумма)
+- `discount_value` (integer, **required**) - значение скидки
+  - Для `percent`: значение от 0 до 100 (например, 15 = 15% скидка)
+  - Для `fixed`: значение sale_price_amount в копейках (должно быть ≤ price_amount)
+
+**Примеры запросов:**
+
+**Установить скидку 15%:**
+```bash
+POST /api/v1/products-api/5/discount
+Authorization: Bearer {token}
+Content-Type: application/json
+
+{
+  "discount_type": "percent",
+  "discount_value": 15
+}
+```
+
+**Установить фиксированную цену 800 копеек:**
+```bash
+POST /api/v1/products-api/5/discount
+Authorization: Bearer {token}
+Content-Type: application/json
+
+{
+  "discount_type": "fixed",
+  "discount_value": 800
+}
+```
+
+**Пример ответа:**
+```json
+{
+  "success": true,
+  "message": "Скидка успешно установлена",
+  "data": {
+    "id": 5,
+    "name": "Товар",
+    "price_amount": 1000,
+    "sale_price_amount": 850,
+    "quantity": 10,
+    ...
+  }
+}
+```
+
+**Возможные ошибки:**
+```json
+{
+  "success": false,
+  "message": "Процент скидки не может превышать 100",
+  "errors": {
+    "discount_value": ["Процент скидки должен быть от 0 до 100"]
+  }
+}
+```
+
+```json
+{
+  "success": false,
+  "message": "Цена со скидкой не может превышать базовую цену",
+  "errors": {
+    "discount_value": ["Значение sale_price_amount не может быть больше price_amount"]
+  }
+}
+```
+
+---
+
+### 7. Массовая установка скидки
+**POST** `/api/v1/products-api/bulk-discount`
+
+**Требуется авторизация:** Да
+
+**Content-Type:** `application/json`
+
+**Поля запроса:**
+- `product_ids` (array, **required**) - массив ID товаров (минимум 1)
+- `discount_type` (string, **required**) - тип скидки: `percent` или `fixed`
+- `discount_value` (integer, **required**) - значение скидки
+
+**Примеры запросов:**
+
+**Установить 20% скидку на несколько товаров:**
+```bash
+POST /api/v1/products-api/bulk-discount
+Authorization: Bearer {token}
+Content-Type: application/json
+
+{
+  "product_ids": [1, 3, 5, 7, 10],
+  "discount_type": "percent",
+  "discount_value": 20
+}
+```
+
+**Установить фиксированную цену на несколько товаров:**
+```bash
+POST /api/v1/products-api/bulk-discount
+Authorization: Bearer {token}
+Content-Type: application/json
+
+{
+  "product_ids": [2, 4, 6],
+  "discount_type": "fixed",
+  "discount_value": 500
+}
+```
+
+**Пример ответа (успех):**
+```json
+{
+  "success": true,
+  "message": "Скидка установлена для 5 товаров",
+  "data": {
+    "updated_count": 5,
+    "product_ids": [1, 3, 5, 7, 10]
+  }
+}
+```
+
+**Пример ответа (с пропущенными товарами):**
+
+Если используется `fixed` тип и для некоторых товаров фиксированная цена превышает их базовую цену:
+
+```json
+{
+  "success": true,
+  "message": "Скидка установлена для 3 товаров",
+  "data": {
+    "updated_count": 3,
+    "product_ids": [1, 3, 5, 7, 10],
+    "skipped_product_ids": [7, 10]
+  },
+  "warning": "Некоторые товары пропущены, т.к. фиксированная цена превышает их базовую цену"
+}
+```
+
+---
+
+### 8. Сбросить скидку на товар
+**DELETE** `/api/v1/products-api/{id}/discount`
+
+**Требуется авторизация:** Да
+
+**Описание:** Сбрасывает скидку для товара, устанавливая `sale_price_amount = 0`
+
+**Пример запроса:**
+```bash
+DELETE /api/v1/products-api/5/discount
+Authorization: Bearer {token}
+```
+
+**Пример ответа:**
+```json
+{
+  "success": true,
+  "message": "Скидка успешно сброшена",
+  "data": {
+    "id": 5,
+    "name": "Товар",
+    "price_amount": 1000,
+    "sale_price_amount": 0,
+    ...
+  }
+}
+```
+
+---
+
+### 9. Массовый сброс скидок
+**POST** `/api/v1/products-api/bulk-remove-discount`
+
+**Требуется авторизация:** Да
+
+**Content-Type:** `application/json`
+
+**Поля запроса:**
+- `product_ids` (array, **required**) - массив ID товаров (минимум 1)
+
+**Описание:** Сбрасывает скидки для нескольких товаров одновременно, устанавливая `sale_price_amount = 0`
+
+**Пример запроса:**
+```bash
+POST /api/v1/products-api/bulk-remove-discount
+Authorization: Bearer {token}
+Content-Type: application/json
+
+{
+  "product_ids": [1, 3, 5, 7, 10]
+}
+```
+
+**Пример ответа:**
+```json
+{
+  "success": true,
+  "message": "Скидки сброшены для 5 товаров",
+  "data": {
+    "updated_count": 5,
+    "product_ids": [1, 3, 5, 7, 10]
+  }
+}
+```
+
+---
+
 ## Коды ответов
 
 - `200` - Успешный запрос
@@ -469,6 +685,48 @@ Content-Type: application/json
 {
   "name": "Товар",
   "price_amount": 1000
+}
+```
+
+### Установить скидку 25% на товар
+```bash
+POST /api/v1/products-api/5/discount
+Authorization: Bearer {token}
+Content-Type: application/json
+
+{
+  "discount_type": "percent",
+  "discount_value": 25
+}
+```
+
+### Массово установить скидку 10% на товары
+```bash
+POST /api/v1/products-api/bulk-discount
+Authorization: Bearer {token}
+Content-Type: application/json
+
+{
+  "product_ids": [1, 2, 3, 4, 5],
+  "discount_type": "percent",
+  "discount_value": 10
+}
+```
+
+### Сбросить скидку для товара
+```bash
+DELETE /api/v1/products-api/5/discount
+Authorization: Bearer {token}
+```
+
+### Массово сбросить скидки
+```bash
+POST /api/v1/products-api/bulk-remove-discount
+Authorization: Bearer {token}
+Content-Type: application/json
+
+{
+  "product_ids": [1, 2, 3, 4, 5]
 }
 ```
 

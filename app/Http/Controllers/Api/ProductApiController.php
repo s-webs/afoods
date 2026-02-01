@@ -45,7 +45,7 @@ class ProductApiController extends Controller
         $sortBy = $request->get('sort_by', 'id');
         $sortOrder = $request->get('sort_order', 'desc');
         $allowedSortFields = ['id', 'name', 'price_amount', 'sale_price_amount', 'quantity', 'created_at'];
-        
+
         if (in_array($sortBy, $allowedSortFields)) {
             $query->orderBy($sortBy, $sortOrder);
         }
@@ -53,7 +53,7 @@ class ProductApiController extends Controller
         // Пагинация
         $perPage = $request->get('per_page', 15);
         $perPage = min(max((int)$perPage, 1), 100); // Ограничение от 1 до 100
-        
+
         $products = $query->paginate($perPage);
 
         return response()->json([
@@ -98,14 +98,14 @@ class ProductApiController extends Controller
             'unit' => ['nullable', 'string', 'max:50'],
             'price_amount' => ['nullable', 'integer', 'min:0'],
             'sale_price_amount' => ['nullable', 'integer', 'min:0'],
-            'quantity' => ['nullable', 'integer', 'min:0'],
+            'quantity' => ['nullable', 'integer'],
             'obj' => ['nullable', 'array'],
         ]);
 
         // Генерируем slug из названия, если не передан
         if (empty($validated['slug'] ?? null) && !empty($validated['name'])) {
             $validated['slug'] = Str::slug($validated['name']);
-            
+
             // Проверяем уникальность slug
             $baseSlug = $validated['slug'];
             $counter = 1;
@@ -149,7 +149,7 @@ class ProductApiController extends Controller
             'unit' => ['nullable', 'string', 'max:50'],
             'price_amount' => ['nullable', 'integer', 'min:0'],
             'sale_price_amount' => ['nullable', 'integer', 'min:0'],
-            'quantity' => ['nullable', 'integer', 'min:0'],
+            'quantity' => ['nullable', 'integer'],
             'obj' => ['nullable', 'array'],
             'slug' => ['nullable', 'string', 'max:255', 'unique:products,slug,' . $id],
         ]);
@@ -159,7 +159,7 @@ class ProductApiController extends Controller
             if (!isset($validated['slug'])) {
                 $baseSlug = Str::slug($validated['name']);
                 $validated['slug'] = $baseSlug;
-                
+
                 // Проверяем уникальность slug
                 $counter = 1;
                 while (Product::where('slug', $validated['slug'])->where('id', '!=', $id)->exists()) {
@@ -189,6 +189,175 @@ class ProductApiController extends Controller
         return response()->json([
             'success' => true,
             'message' => 'Товар успешно удален',
+        ]);
+    }
+
+    /**
+     * Установить скидку для одного товара
+     */
+    public function setDiscount(Request $request, int $id): JsonResponse
+    {
+        $product = Product::findOrFail($id);
+
+        $validated = $request->validate([
+            'discount_type' => ['required', 'string', 'in:percent,fixed'],
+            'discount_value' => ['required', 'integer', 'min:0'],
+        ]);
+
+        $discountType = $validated['discount_type'];
+        $discountValue = $validated['discount_value'];
+
+        if ($discountType === 'percent') {
+            // Валидация для процентов: от 0 до 100
+            if ($discountValue > 100) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Процент скидки не может превышать 100',
+                    'errors' => [
+                        'discount_value' => ['Процент скидки должен быть от 0 до 100']
+                    ]
+                ], 422);
+            }
+
+            // Расчет скидки от price_amount
+            $salePriceAmount = (int) round($product->price_amount * (100 - $discountValue) / 100);
+        } else {
+            // Для фиксированной суммы - проверяем что она не больше price_amount
+            if ($discountValue > $product->price_amount) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Цена со скидкой не может превышать базовую цену',
+                    'errors' => [
+                        'discount_value' => ['Значение sale_price_amount не может быть больше price_amount']
+                    ]
+                ], 422);
+            }
+
+            $salePriceAmount = $discountValue;
+        }
+
+        $product->update(['sale_price_amount' => $salePriceAmount]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Скидка успешно установлена',
+            'data' => $product->fresh(),
+        ]);
+    }
+
+    /**
+     * Массовая установка скидки
+     */
+    public function bulkSetDiscount(Request $request): JsonResponse
+    {
+        $validated = $request->validate([
+            'product_ids' => ['required', 'array', 'min:1'],
+            'product_ids.*' => ['integer', 'exists:products,id'],
+            'discount_type' => ['required', 'string', 'in:percent,fixed'],
+            'discount_value' => ['required', 'integer', 'min:0'],
+        ]);
+
+        $productIds = $validated['product_ids'];
+        $discountType = $validated['discount_type'];
+        $discountValue = $validated['discount_value'];
+
+        if ($discountType === 'percent') {
+            // Валидация для процентов
+            if ($discountValue > 100) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Процент скидки не может превышать 100',
+                    'errors' => [
+                        'discount_value' => ['Процент скидки должен быть от 0 до 100']
+                    ]
+                ], 422);
+            }
+
+            // Получаем товары и обновляем каждый
+            $products = Product::whereIn('id', $productIds)->get();
+            $updatedCount = 0;
+
+            foreach ($products as $product) {
+                $salePriceAmount = (int) round($product->price_amount * (100 - $discountValue) / 100);
+                $product->update(['sale_price_amount' => $salePriceAmount]);
+                $updatedCount++;
+            }
+        } else {
+            // Для фиксированной суммы - проверяем каждый товар
+            $products = Product::whereIn('id', $productIds)->get();
+            $updatedCount = 0;
+            $skippedProducts = [];
+
+            foreach ($products as $product) {
+                if ($discountValue > $product->price_amount) {
+                    $skippedProducts[] = $product->id;
+                    continue;
+                }
+
+                $product->update(['sale_price_amount' => $discountValue]);
+                $updatedCount++;
+            }
+
+            // Если были пропущенные товары, добавляем предупреждение
+            if (!empty($skippedProducts)) {
+                return response()->json([
+                    'success' => true,
+                    'message' => "Скидка установлена для {$updatedCount} товаров",
+                    'data' => [
+                        'updated_count' => $updatedCount,
+                        'product_ids' => $productIds,
+                        'skipped_product_ids' => $skippedProducts,
+                    ],
+                    'warning' => 'Некоторые товары пропущены, т.к. фиксированная цена превышает их базовую цену'
+                ]);
+            }
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => "Скидка установлена для {$updatedCount} товаров",
+            'data' => [
+                'updated_count' => $updatedCount,
+                'product_ids' => $productIds,
+            ],
+        ]);
+    }
+
+    /**
+     * Сбросить скидку для одного товара
+     */
+    public function removeDiscount(int $id): JsonResponse
+    {
+        $product = Product::findOrFail($id);
+        $product->update(['sale_price_amount' => 0]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Скидка успешно сброшена',
+            'data' => $product->fresh(),
+        ]);
+    }
+
+    /**
+     * Массовый сброс скидок
+     */
+    public function bulkRemoveDiscount(Request $request): JsonResponse
+    {
+        $validated = $request->validate([
+            'product_ids' => ['required', 'array', 'min:1'],
+            'product_ids.*' => ['integer', 'exists:products,id'],
+        ]);
+
+        $productIds = $validated['product_ids'];
+        $updatedCount = Product::whereIn('id', $productIds)->update(['sale_price_amount' => 0]);
+
+        return response()->json([
+            'success' => true,
+            'message' => "Скидки сброшены для {$updatedCount} товаров",
+            'data' => [
+                'updated_count' => $updatedCount,
+                'product_ids' => $productIds,
+            ],
         ]);
     }
 }

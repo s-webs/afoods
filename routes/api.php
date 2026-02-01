@@ -15,6 +15,9 @@ Route::get('health', [HealthApiController::class, 'check']);
 // Публичные маршруты авторизации (не требуют токена)
 Route::prefix('v1')->group(function () {
     Route::post('auth/login', [AuthApiController::class, 'login']);
+    Route::apiResource('products-api', ProductApiController::class)->only([
+        'index'
+    ]);
 });
 
 // Защищённые маршруты (требуют токен)
@@ -23,11 +26,17 @@ Route::prefix('v1')->middleware('auth:sanctum')->group(function () {
     Route::post('auth/logout', [AuthApiController::class, 'logout']);
     Route::post('auth/logout-all', [AuthApiController::class, 'logoutAll']);
     Route::get('auth/user', [AuthApiController::class, 'user']);
-    
+
     // API для товаров
     Route::apiResource('products-api', ProductApiController::class)->only([
-        'index', 'show', 'store', 'update', 'destroy'
+        'show', 'store', 'update', 'destroy'
     ]);
+
+    // Управление скидками
+    Route::post('products-api/{id}/discount', [ProductApiController::class, 'setDiscount']);
+    Route::post('products-api/bulk-discount', [ProductApiController::class, 'bulkSetDiscount']);
+    Route::delete('products-api/{id}/discount', [ProductApiController::class, 'removeDiscount']);
+    Route::post('products-api/bulk-remove-discount', [ProductApiController::class, 'bulkRemoveDiscount']);
 
     // API для категорий
     Route::apiResource('categories-api', CategoryApiController::class)->only([
@@ -43,7 +52,7 @@ Route::prefix('v1')->middleware('auth:sanctum')->group(function () {
     Route::apiResource('sales-api', SaleApiController::class)->only([
         'index', 'show', 'store', 'update', 'destroy'
     ]);
-    
+
     // Получение чека по продаже
     Route::get('sales-api/{id}/receipt', [SaleApiController::class, 'receipt']);
 
