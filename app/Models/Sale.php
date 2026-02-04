@@ -14,6 +14,7 @@ class Sale extends Model
         'cashier_id',
         'shift_id',
         'shopper_id',
+        'debtor_id',
         'receipt_number',
         'total_price',
         'total_qty',
@@ -48,5 +49,13 @@ class Sale extends Model
     public function shift(): BelongsTo
     {
         return $this->belongsTo(Shift::class);
+    }
+
+    /**
+     * Get the debtor associated with the sale.
+     */
+    public function debtor(): BelongsTo
+    {
+        return $this->belongsTo(Debtor::class);
     }
 }

@@ -39,7 +39,7 @@ class SaleApiController extends Controller
         // Пагинация
         $perPage = min(max((int) $request->get('per_page', 15), 1), 100);
 
-        $sales = $query->paginate($perPage);
+        $sales = $query->with(['shopper', 'debtor'])->paginate($perPage);
 
         return response()->json([
             'success' => true,
@@ -58,7 +58,7 @@ class SaleApiController extends Controller
      */
     public function show(int $id): JsonResponse
     {
-        $sale = Sale::with('shopper')->findOrFail($id);
+        $sale = Sale::with(['shopper', 'debtor'])->findOrFail($id);
 
         return response()->json([
             'success' => true,
@@ -74,10 +74,12 @@ class SaleApiController extends Controller
         $validated = $request->validate([
             'cashier_id' => 'nullable|integer',
             'shift_id' => 'nullable|integer',
+            'shopper_id' => 'nullable|integer',
+            'debtor_id' => 'nullable|integer|exists:debtors,id',
             'receipt_number' => 'required|string',
             'total_price' => 'required|numeric',
             'total_qty' => 'required|numeric',
-            'date' => 'nullable|string',  // ← сделайте nullable
+            'date' => 'nullable|string',
             'items' => 'required|array',
             'items.*.product_id' => 'required|integer',
             'items.*.name_snapshot' => 'required|string',
@@ -116,6 +118,8 @@ class SaleApiController extends Controller
         $validated = $request->validate([
             'cashier_id' => 'nullable|integer',
             'shift_id' => 'nullable|integer',
+            'shopper_id' => 'nullable|integer',
+            'debtor_id' => 'nullable|integer|exists:debtors,id',
             'receipt_number' => 'nullable|string',
             'total_price' => 'nullable|numeric',
             'total_qty' => 'nullable|numeric',

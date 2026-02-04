@@ -8,6 +8,11 @@ use App\Http\Controllers\Api\CashierApiController;
 use App\Http\Controllers\Api\SaleApiController;
 use App\Http\Controllers\Api\HealthApiController;
 use App\Http\Controllers\Api\AuthApiController;
+use App\Http\Controllers\Api\PromotionApiController;
+use App\Http\Controllers\Api\StockReceiptApiController;
+use App\Http\Controllers\Api\CounterpartyApiController;
+use App\Http\Controllers\Api\DebtorApiController;
+use App\Http\Controllers\Api\TodoApiController;
 
 // Health check (без версии, для пингования)
 Route::get('health', [HealthApiController::class, 'check']);
@@ -55,6 +60,25 @@ Route::prefix('v1')->middleware('auth:sanctum')->group(function () {
 
     // Получение чека по продаже
     Route::get('sales-api/{id}/receipt', [SaleApiController::class, 'receipt']);
+
+    // API для акций
+    Route::post('promotions-api/{id}/expand', [PromotionApiController::class, 'expand']);
+    Route::apiResource('promotions-api', PromotionApiController::class);
+
+    // API для приходов товара
+    Route::apiResource('stock-receipts-api', StockReceiptApiController::class);
+
+    // API для контрагентов
+    Route::apiResource('counterparties-api', CounterpartyApiController::class);
+
+    // API для должников
+    Route::get('debtors-api/{id}/sales', [DebtorApiController::class, 'sales']);
+    Route::patch('debtors-api/{id}/amount', [DebtorApiController::class, 'updateAmount']);
+    Route::apiResource('debtors-api', DebtorApiController::class);
+
+    // API для To-Do задач
+    Route::patch('todos-api/{id}/complete', [TodoApiController::class, 'complete']);
+    Route::apiResource('todos-api', TodoApiController::class);
 
     // API для смен
     Route::get('shifts', [ShiftApiController::class, 'index']);
