@@ -217,14 +217,28 @@ class CartController extends Controller
         $receiptNumber = 'RCP-' . date('Ymd') . '-' . str_pad(Sale::count() + 1, 6, '0', STR_PAD_LEFT);
 
         // Create sale
+        $saleItems = array_map(fn ($item) => [
+            'product_id' => $item['product_id'],
+            'name_snapshot' => $item['product']->name ?? '',
+            'price' => $item['price'],
+            'quantity' => $item['quantity'],
+        ], $items);
+
         $sale = Sale::create([
-            'cashier_id' => null, // Will be filled later
-            'shift_id' => null, // Will be filled later
+            'cashier_id' => null,
+            'shift_id' => null,
+            'shopper_id' => $shopper?->id,
             'date' => now(),
             'receipt_number' => $receiptNumber,
-            'items' => $items,
+            'items' => $saleItems,
             'total_price' => CartService::getTotalPrice(),
+            'total_qty' => CartService::getTotalCount(),
         ]);
+
+        // Списываем количество товара (разрешён отрицательный остаток)
+        foreach ($items as $item) {
+            Product::where('id', $item['product_id'])->decrement('quantity', $item['quantity']);
+        }
 
         // Clear cart
         CartService::clear();

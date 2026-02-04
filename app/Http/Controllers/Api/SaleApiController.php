@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\Product;
 use App\Models\Sale;
 use App\Services\ReceiptService;
 use Illuminate\Http\JsonResponse;
@@ -91,8 +92,12 @@ class SaleApiController extends Controller
             $validated['date'] = now();
         }
 
-
         $sale = Sale::create($validated);
+
+        // Списываем количество товара (разрешён отрицательный остаток)
+        foreach ($validated['items'] as $item) {
+            Product::where('id', $item['product_id'])->decrement('quantity', (int) $item['quantity']);
+        }
 
         return response()->json([
             'success' => true,
@@ -116,12 +121,23 @@ class SaleApiController extends Controller
             'total_qty' => 'nullable|numeric',
             'items' => 'nullable|array',
             'items.*.product_id' => 'required|integer',
-            'items.*.name_snapshot' => 'required|string',     // ← Добавьте
+            'items.*.name_snapshot' => 'required|string',
             'items.*.price' => 'required|numeric',
             'items.*.quantity' => 'required|numeric',
-            'items.*.discount_type' => 'nullable|string',     // ← Добавьте
-            'items.*.discount_value' => 'nullable|numeric',   // ← Добавьте
+            'items.*.discount_type' => 'nullable|string',
+            'items.*.discount_value' => 'nullable|numeric',
         ]);
+
+        if (isset($validated['items'])) {
+            // Возвращаем количество по старым позициям
+            foreach ($sale->items as $oldItem) {
+                Product::where('id', $oldItem['product_id'])->increment('quantity', (int) $oldItem['quantity']);
+            }
+            // Списываем по новым позициям (разрешён отрицательный остаток)
+            foreach ($validated['items'] as $item) {
+                Product::where('id', $item['product_id'])->decrement('quantity', (int) $item['quantity']);
+            }
+        }
 
         $sale->update($validated);
 
@@ -138,6 +154,12 @@ class SaleApiController extends Controller
     public function destroy(int $id): JsonResponse
     {
         $sale = Sale::findOrFail($id);
+
+        // Возвращаем количество товара на склад
+        foreach ($sale->items as $item) {
+            Product::where('id', $item['product_id'])->increment('quantity', (int) $item['quantity']);
+        }
+
         $sale->delete();
 
         return response()->json([

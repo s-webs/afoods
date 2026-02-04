@@ -7,7 +7,7 @@ use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Str;
-use Illuminate\Validation\ValidationException;
+use Illuminate\Support\Facades\Storage;
 
 class ProductApiController extends Controller
 {
@@ -91,8 +91,8 @@ class ProductApiController extends Controller
             'name' => ['required', 'string', 'max:255'],
             'new_name' => ['nullable', 'string', 'max:255'],
             'barcode' => ['nullable', 'string', 'max:255', 'unique:products,barcode'],
-            'images' => ['nullable', 'array'],
-            'images.*' => ['string'],
+            'images' => ['nullable', 'array', 'max:5'],
+            'images.*' => ['nullable', 'file', 'image', 'mimes:webp,jpeg,jpg,png', 'max:2048'],
             'description' => ['nullable', 'string'],
             'specs' => ['nullable', 'array'],
             'unit' => ['nullable', 'string', 'max:50'],
@@ -101,6 +101,11 @@ class ProductApiController extends Controller
             'quantity' => ['nullable', 'integer'],
             'obj' => ['nullable', 'array'],
         ]);
+
+        // Сохраняем изображения в public/uploads/products
+        if (!empty($validated['images'])) {
+            $validated['images'] = $this->saveProductImages($validated['images']);
+        }
 
         // Генерируем slug из названия, если не передан
         if (empty($validated['slug'] ?? null) && !empty($validated['name'])) {
@@ -142,8 +147,8 @@ class ProductApiController extends Controller
             'name' => ['sometimes', 'required', 'string', 'max:255'],
             'new_name' => ['nullable', 'string', 'max:255'],
             'barcode' => ['nullable', 'string', 'max:255', 'unique:products,barcode,' . $id],
-            'images' => ['nullable', 'array'],
-            'images.*' => ['string'],
+            'images' => ['nullable', 'array', 'max:5'],
+            'images.*' => ['nullable', 'file', 'image', 'mimes:webp,jpeg,jpg,png', 'max:2048'],
             'description' => ['nullable', 'string'],
             'specs' => ['nullable', 'array'],
             'unit' => ['nullable', 'string', 'max:50'],
@@ -153,6 +158,11 @@ class ProductApiController extends Controller
             'obj' => ['nullable', 'array'],
             'slug' => ['nullable', 'string', 'max:255', 'unique:products,slug,' . $id],
         ]);
+
+        // Сохраняем изображения в public/uploads/products
+        if (!empty($validated['images'])) {
+            $validated['images'] = $this->saveProductImages($validated['images']);
+        }
 
         // Если изменилось название, обновляем slug
         if (isset($validated['name']) && $validated['name'] !== $product->name) {
@@ -359,5 +369,53 @@ class ProductApiController extends Controller
                 'product_ids' => $productIds,
             ],
         ]);
+    }
+
+    /**
+     * Сохраняет изображения в public/uploads/products и возвращает массив путей
+     *
+     * @param array $images Массив: UploadedFile, base64-строки или пути к уже сохранённым файлам
+     * @return array
+     */
+    private function saveProductImages(array $images): array
+    {
+        $savedPaths = [];
+        $uploadDir = 'uploads/products';
+
+        foreach ($images as $image) {
+            if (empty($image)) {
+                continue;
+            }
+
+            // Загруженный файл (multipart/form-data)
+            if ($image instanceof \Illuminate\Http\UploadedFile) {
+                $path = $image->store($uploadDir, 'public');
+                if ($path) {
+                    $savedPaths[] = $path;
+                }
+                continue;
+            }
+
+            // Base64-строка (data:image/...;base64,...)
+            if (is_string($image) && preg_match('/^data:image\/(\w+);base64,(.+)$/', $image, $matches)) {
+                $extension = $matches[1] === 'jpeg' ? 'jpg' : $matches[1];
+                $data = base64_decode($matches[2]);
+                if ($data !== false) {
+                    $filename = Str::random(40) . '.' . $extension;
+                    $path = $uploadDir . '/' . $filename;
+                    if (Storage::disk('public')->put($path, $data)) {
+                        $savedPaths[] = $path;
+                    }
+                }
+                continue;
+            }
+
+            // Уже сохранённый путь (начинается с uploads/products/)
+            if (is_string($image) && str_starts_with($image, 'uploads/products/')) {
+                $savedPaths[] = $image;
+            }
+        }
+
+        return $savedPaths;
     }
 }

@@ -12,7 +12,7 @@ class HomeController extends Controller
     public function index()
     {
         $slides = Slide::query()->where('is_active', 1)->get();
-        $products = Product::take(5)->get();
+        $products = Product::take(5)->orderBy('id', 'desc')->get();
 
         return view('pages.home.index', compact('slides', 'products'));
     }
